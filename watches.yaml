@@ -1,0 +1,7 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+- version: v1alpha1
+  group: goweb.com
+  kind: GoWebApp
+  role: gowebapp
+# +kubebuilder:scaffold:watch

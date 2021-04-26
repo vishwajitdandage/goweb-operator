@@ -1,0 +1,6 @@
+apiVersion: goweb.com/v1alpha1
+kind: GoWebApp
+metadata:
+  name: gowebapp-sample
+spec:
+  foo: bar
