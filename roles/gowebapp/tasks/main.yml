@@ -1,2 +1,78 @@
 ---
 # tasks file for GoWebApp
+- name: deploy go-webapp
+  vars:
+    frontend:
+      image: "{{  lookup('env', 'RELATED_IMAGE_FRONTEND') }}"
+  k8s:
+    definations:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: go-web
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: go-web
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: go-web
+        template:
+          metadata:
+            labels:
+              app: go-web
+          spec:
+            serviceAccount: goweb-operator
+            containers:
+            - name: go-web
+              image: {{ frontend.image }}
+              imagePullPolicy: Always
+              ports:
+              - name: web-server
+                containerPort: 8080
+              securityContext: {}
+          serviceAccountName: goweb-operator
+          serviceAccount: goweb-operator
+        strategy:
+          type: Recreate
+- name: create service for go-webapp
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata: 
+        name: go-web
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        labels:
+          app: go-web
+      spec:
+        selector:
+          app: go-web
+        ports:
+          - protocol: TCP
+            port: 8080
+            targetPort: 8080
+        type: NodePort
+- name: create route for go-webapp
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: go-web
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        labels:
+          app: go-web
+      spec:
+        host:
+        to:
+          kind: Service
+          name: go-web
+          weight: 100
+        port:
+          targetPort: 8080
+        tls:
+          termination: edge
+          insecureEdgeTerminationPolicy: Allow
+        wildcardPolicy: None

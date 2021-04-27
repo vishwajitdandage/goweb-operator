@@ -3,4 +3,11 @@ kind: GoWebApp
 metadata:
   name: gowebapp-sample
 spec:
-  foo: bar
+  frontend:
+    image: quay.io/yuvan/go-web
+    imagePullSecrets: []
+    replicaCount: 1
+    service:
+      port: 8080
+      targetPort: 8080
+      type: NodePort

@@ -1,2 +1,11 @@
 ---
-# vars file for GoWebApp
+frontend:
+  image: quay.io/rhm_samples/nodejs-guestbook-frontend:v0.0.1
+  # To pass image pull secrets
+  imagePullSecrets: []
+  replicaCount: 1
+  
+  service:
+    type: NodePort
+    port: 8080
+    targetPort: 8080

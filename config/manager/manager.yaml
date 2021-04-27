@@ -2,33 +2,37 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    control-plane: controller-manager
+    control-plane: goweb-operator
   name: system
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: controller-manager
-  namespace: system
+  name: goweb-operator
   labels:
-    control-plane: controller-manager
+    control-plane: goweb-operator
 spec:
   selector:
     matchLabels:
-      control-plane: controller-manager
+      control-plane: goweb-operator
   replicas: 1
   template:
     metadata:
       labels:
-        control-plane: controller-manager
+        control-plane: goweb-operator
     spec:
       containers:
         - name: manager
+          image: quay.io/yuvan/goweb-operator:v0.0.1
+          imagePullPolicy: Always
           args:
             - "--enable-leader-election"
             - "--leader-election-id=goweb-operator"
           env:
             - name: ANSIBLE_GATHERING
               value: explicit
-          image: controller:latest
+            - name: OPERATOR_NAME
+              value: "goweb-operator"
+            - name: RELATED_IMAGE_FRONTEND
+              value: quay.io/yuvan/go-web
       terminationGracePeriodSeconds: 10
